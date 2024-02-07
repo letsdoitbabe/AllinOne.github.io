@@ -1,162 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AllinOne</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Engine</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
 
-    #container {
-      border: 2px solid red; /* Red border for the entire content */
-      border-radius: 10px; /* Rounded corners */
-      overflow: hidden; /* Hide overflow content outside the border */
-      height: 100vh; /* Make the container height 100% of the viewport height */
-    }
+        #search-container {           
+            position: relative;
+            margin-top: 50px; 
+            margin-bottom: 20px;
+        }
 
-    #header-container {
-      position: relative;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      z-index: 2; /* Ensure the heading is above other elements */
-      border-radius: 250px;
-      margin-bottom: 20px;
-    }
+        #search-box {
+            width: 300px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            padding-right: 40px; /* Space for the microphone button */
+            margin-bottom: 10px;
+        }
 
-    #heading {
-      width: 100%;
-      font-size: 1em;
-      color: rgba(0, 0, 0, 0.7);
-      display: inline-block; /* Ensures the entire word is treated as one block */
-    }
+        #search-mic,
+        #search-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
 
-    #line {
-      width: 100%;
-      height: 2px;
-      background-color: #3498db; /* Blue color for the line */
-      margin-top: 10px; /* Adjust the margin to move the line below the heading */
-      margin-bottom: 10px; /* Adjust the margin as needed */
-    }
+        #search-mic {
+            right: 10px;
+        }
 
-    .letter {
-      display: inline-block;
-      color: #1a1a1a;
-      transform: translateY(-100%);
-      animation: dropLetter 0.5s ease-in-out forwards;
-    }
+        #search-btn {
+            right: 45px;
+        }
 
-    @keyframes dropLetter {
-      0%, 20% {
-        transform: translateY(-100%);
-      }
-      100% {
-        transform: translateY(0);
-      }
-    }
+        #search-results {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-    .text-container {
-      display: flex;
-      justify-content: space-between;
-    }
+        .result-item {
+            width: 80%;
+            height: 100px; /* Fixed height for each result item */
+            overflow: hidden; /* Hide overflow content */
+            padding: 10px;
+            border: 2px solid blue;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer; /* Change cursor to pointer */
+        }
 
-    .text-box {
-      width: 48%;
-      height: 100px;
-      margin: 10px;
-      padding: 10px;
-      cursor: pointer;
-      box-shadow: 3px 3px 5px #888888;
-      z-index: 1; /* Ensure the boxes are behind the heading */
-      overflow: hidden; /* Added to ensure the text fits within the box */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 10px;
-      border: 2px solid red; /* Add a red border to each text box */
-    }
+        .result-item h3 {
+            margin-bottom: 5px;
+            cursor: pointer; /* Change cursor to pointer */
+        }
 
-    .text-box:hover {
-      background-color: #e0e0e0; /* Add a background color on hover */
-    }
+        .result-item p {
+            margin-bottom: 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
 
-    /* Customize each text box */
-    .text-box:nth-child(1) {
-      background-color: yellow; /* Light Pink */
-      font-size: 30px;
-    }
+        .result-item a {
+            text-decoration: none; /* Remove default underline */
+            color: blue; /* Change link color */
+            cursor: pointer; /* Change cursor to pointer */
+            display: block; /* Make the link fill the entire result item */
+        }
 
-    .text-box:nth-child(2) {
-      background-color: yellow; /* Light Blue */
-      font-size: 30px;
-    }
+        .result-item a:hover {
+            text-decoration: underline; /* Add underline on hover */
+        }
 
-    .text-box:nth-child(3) {
-      background-color: brown; /* Moccasin */
-      font-size: 16px;
-    }
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
 
-    .text-box:nth-child(4) {
-      background-color: #98fb98; /* Pale Green */
-      font-size: 22px;
-    }
-  </style>
+        
+        #scroll-to-top-btn,
+        #load-more-btn {
+            display: none; /* Initially hide the button */
+            position: relative;
+            bottom: 1%;
+            right: 1%;
+            background-color: transparent;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 3em;
+        }
+        #back-btn {
+            border-radius: 10px;
+            position: absolute;
+            top: 1.5%;
+            left: 8.8%;
+            font-size: 1em;
+            background-color: transparent;
+        }
+    </style>
 </head>
 <body>
 
-  <div id="container">
-    <div id="header-container">
-      <div id="heading-box">
-        <h1 id="heading">
-          <span class="letter">W</span>
-          <span class="letter">e</span>
-          <span class="letter">l</span>
-          <span class="letter">c</span>
-          <span class="letter">o</span>
-          <span class="letter">m</span>
-          <span class="letter">e</span>
-          <span class="letter">,</span>
-          <span class="letter">&nbsp;</span>
-          <span class="letter">b</span>
-          <span class="letter">a</span>
-          <span class="letter">c</span>
-          <span class="letter">k</span>
-          <span class="letter">!</span>
-        </h1>
-      </div>
-    </div>
-    <div id="line"></div>
+<div id="search-container">
+    <input type="text" id="search-box" placeholder="Search...">
+    <div id="search-mic" onclick="startSpeechRecognition()">🎤</div>
+    <div id="search-btn" onclick="searchByQuery()">🔍</div>
+</div>
 
-    <div class="text-container">
-      <div class="text-box" onclick="navigateToPage('https://letsdoitbabe.github.io/utube.github.io/')">𝕐𝕠𝕦𝕋𝕦𝕓𝕖</div>
-      <div class="text-box" onclick="navigateToPage('https://letsdoitbabe.github.io/browser.github.io/')">𝔹𝕣𝕠𝕨𝕤𝕖𝕣</div>
-    </div>
-    
-    <div class="text-container">
-      <div class="text-box" onclick="navigateToPage('https://wait')">SOON</div>
-      <div class="text-box" onclick="navigateToPage('https://wait')">SOON</div>
-    </div>
-  </div>
+<div id="search-results"></div>
 
-  <!-- Add more rows as needed -->
+<div class="btn-container">
+    <button id="back-btn" onclick="goBack()">🡸</button>
+    <button id="scroll-to-top-btn" onclick="scrollToTop()">⏫</button>
+    <button id="load-more-btn" onclick="loadMoreResults()">⏬</button>
+</div>
+<hr>
+<script>
+    let nextPageToken = '';
+    const resultsPerPage = 10;
+    let totalResults = 0;
 
-  <script>
-    function navigateToPage(url) {
-      window.location.href = url;
+    function startSpeechRecognition() {
+        const recognition = new webkitSpeechRecognition() || new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.onresult = function (event) {
+            const speechResult = event.results[0][0].transcript;
+            document.getElementById('search-box').value = speechResult;
+            searchGoogle(speechResult);
+        };
+        recognition.start();
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-      const letters = document.querySelectorAll('.letter');
-      letters.forEach(function (letter, index) {
-        letter.style.animationDelay = `${index * 0.2}s`;
-      });
+    function searchByQuery() {
+        const query = document.getElementById('search-box').value;
+        searchGoogle(query);
+    }
+
+    function searchGoogle(query) {
+        const apiKey = 'AIzaSyCopgJYXntKkxg4nFVkMIju8Xu9tKu4xr0';
+        const cx = '91247f6037af843f4';
+        const apiUrl = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${apiKey}&cx=${cx}&num=${resultsPerPage}&start=1${nextPageToken ? `&pageToken=${nextPageToken}` : ''}`;
+
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                totalResults = data.searchInformation.totalResults;
+                displaySearchResults(data.items);
+                nextPageToken = data.nextPageToken || '';
+                document.getElementById('load-more-btn').style.display = 'block'; // Show the button after search
+                document.getElementById('scroll-to-top-btn').style.display = 'block'; // Show scroll to top button after search
+            })
+            .catch(error => {
+                console.error('Error fetching search results:', error);
+            });
+    }
+
+    function loadMoreResults() {
+        const query = document.getElementById('search-box').value;
+        const apiKey = 'AIzaSyCopgJYXntKkxg4nFVkMIju8Xu9tKu4xr0';
+        const cx = '91247f6037af843f4';
+        const apiUrl = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${apiKey}&cx=${cx}&num=${resultsPerPage}&start=${resultsPerPage + 1}&pageToken=${nextPageToken}`;
+
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                displaySearchResults(data.items);
+                nextPageToken = data.nextPageToken || '';
+            })
+            .catch(error => {
+                console.error('Error fetching more search results:', error);
+            });
+    }
+
+    function displaySearchResults(results) {
+        const resultsContainer = document.getElementById('search-results');
+
+        resultsContainer.innerHTML = ''; // Clear previous results
+
+        results.forEach(result => {
+            const resultItem = document.createElement('div');
+            resultItem.className = 'result-item';
+            resultItem.innerHTML = `
+                <h3 onclick="redirectToLink('${result.link}')">${result.title}</h3>
+                <p>${result.snippet}</p>
+                <a href="#" onclick="redirectToLink('${result.link}')">Read more</a>
+            `;
+            resultsContainer.appendChild(resultItem);
+        });
+
+        if (resultsContainer.childElementCount >= totalResults) {
+            document.getElementById('load-more-btn').style.display = 'none';
+        } else {
+            document.getElementById('load-more-btn').style.display = 'block';
+        }
+    }
+
+    function redirectToLink(link) {
+        window.location.replace(link);
+    }
+
+    function goBack() {
+        window.history.back(); }
+
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Event listener for Enter key to trigger search
+    document.getElementById('search-box').addEventListener('keyup', function(event) {
+        if (event.keyCode === 13) { // keyCode 13 corresponds to Enter key
+            event.preventDefault();
+            searchByQuery();
+        }
     });
-  </script>
+</script>
+
 
 </body>
 </html>
